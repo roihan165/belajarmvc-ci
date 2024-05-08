@@ -8,7 +8,8 @@
                                 <div class="text-center">
                                     <h1 class="h4 text-gray-900 mb-4">Login Page</h1>
                                 </div>
-                                <form action="" class="user">
+                                <?= $this->session->flashdata('message');?>
+                                <form action="post" class="user" action="">
                                     <div class="form-group">
                                         <input type="text" name="email" id="email" class="form-control form-control-user" aria-describedby="emailHelp" placeholder="Enter Email Address...*">
                                     </div>
