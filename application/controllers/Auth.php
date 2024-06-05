@@ -12,6 +12,7 @@ class Auth extends CI_Controller
 
     public function index()
     {
+
         $this->form_validation->set_rules(
             'email',
             'Email',
@@ -156,5 +157,6 @@ class Auth extends CI_Controller
         );
 
         redirect('auth');
+
     }
 }
