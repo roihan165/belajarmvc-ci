@@ -12,13 +12,79 @@ class Auth extends CI_Controller
 
     public function index()
     {
-        $this->load->view('templates/auth_header');
-        $this->load->view('login');
-        $this->load->view('templates/auth_footer');
+
+        $this->form_validation->set_rules(
+            'email',
+            'Email',
+            'required|trim'
+        );
+
+        $this->form_validation->set_rules(
+            'password',
+            'password',
+            'required|trim'
+        );
+
+        if ($this->form_validation->run() == false) {
+            $data["title"] = 'Login Page';
+            $this->load->view('templates/auth_header');
+            $this->load->view('login');
+            $this->load->view('templates/auth_footer');
+        } else {
+            $this->_login();
+        }
+    }
+
+    private function _login()
+    {
+        $email = $this->input->post('email');
+        $password = $this->input->post('password');
+        $user = $this->db->get_where('user', [email => $email])->row_array();
+
+        if ($user) {
+            //jika usernya ada 
+            if ($user['is_active'] = 1) {
+                if (password_verify($password, $user['password'])) {
+                    //jika passwordnya benar
+                    $data = [
+                        'email' => $user['email'],
+                        'role_id' => $user['role_id']
+                    ];
+                    $this->session->set_userdata($data);
+                    if($user['role_id']==1){
+                        redirect('admin');
+                    }else{
+                        redirect('user');
+                    }
+                } else {
+                    //jika passwordnya salah
+                    $this->session->set_flashdata(
+                        'message',
+                        '<div class="alert alert-danger" role="alert"> Invalid Password.</div>'
+                    );
+                    redirect('auth');
+                }
+            } else {
+                //jika usernya belum aktivasi
+                $this->session->set_flashdata(
+                    'message',
+                    '<div class="alert alert-danger" role="alert"> This email has not been Activated.</div>'
+                );
+                redirect('auth');
+            }
+        } else {
+            //jika usernya tidak ada di table user
+            $this->session->set_flashdata(
+                'message',
+                '<div class="alert alert-danger" role="alert"> Email is not Registered.</div>'
+            );
+            redirect('auth');
+        }
     }
 
     public function registration()
     {
+
         $this->form_validation->set_rules(
             'name',
             'Name',
@@ -30,7 +96,7 @@ class Auth extends CI_Controller
             'Email',
             'required|trim|valid_email|is_unique[user.email]',
             [
-                'is_unique' => 'This Email already Registered'
+                'is_unique' => 'This Email has already Registered !'
             ]
         );
 
@@ -39,8 +105,8 @@ class Auth extends CI_Controller
             'Password',
             'required|trim|min_length[3]|matches[password2]',
             [
-                'matches' => 'Password does not match!',
-                'min_length' => 'Password too short'
+                'matches' => 'Password does not match !',
+                'min_length' => 'password too short'
             ]
         );
 
@@ -51,14 +117,14 @@ class Auth extends CI_Controller
         );
 
         if ($this->form_validation->run() == false) {
-            $data['title'] = 'Registration Page';
+            $data["title"] = 'Registration Page';
             $this->load->view('templates/auth_header', $data);
             $this->load->view('registration');
             $this->load->view('templates/auth_footer');
         } else {
             $data = [
-                'name' => $this->input->post('name', true),
-                'email' => $this->input->post('email', true),
+                'name' => htmlspecialchars($this->input->post('name', true)),
+                'email' => htmlspecialchars($this->input->post('email', true)),
                 'image' => 'default.jpg',
                 'password' => password_hash($this->input->post('password1'), PASSWORD_DEFAULT),
                 'role_id' => 2,
@@ -70,17 +136,27 @@ class Auth extends CI_Controller
             $this->session->set_flashdata(
                 'message',
                 '<div class="alert alert-success" role="alert">
-                    Congratulations! Your account has been created. Please log in.
+                    Congratulation! Your Account Has Been Created. Please Login.
                 </div>'
             );
-            redirect('auth'); // Replace with the appropriate route
+
+            redirect('auth');
         }
     }
 
-    public function forgot_password()
+    public function logout()
     {
-        $this->load->view('templates/auth_header');
-        $this->load->view('forgot-password.html');
-        $this->load->view('templates/auth_footer');
+        $this->session->unset_userdata('email');
+        $this->session->unset_userdata('role_id');
+
+        $this->session->set_flashdata(
+            'message',
+            '<div class="alert alert-success" role="alert">
+                You have been logged out!!!
+            </div>'
+        );
+
+        redirect('auth');
+
     }
 }
