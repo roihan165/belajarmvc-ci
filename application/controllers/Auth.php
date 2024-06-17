@@ -39,7 +39,7 @@ class Auth extends CI_Controller
     {
         $email = $this->input->post('email');
         $password = $this->input->post('password');
-        $user = $this->db->get_where('user', [email => $email])->row_array();
+        $user = $this->db->get_where('user', ['email' => $email])->row_array();
 
         if ($user) {
             //jika usernya ada 
@@ -51,9 +51,9 @@ class Auth extends CI_Controller
                         'role_id' => $user['role_id']
                     ];
                     $this->session->set_userdata($data);
-                    if($user['role_id']==1){
+                    if ($user['role_id'] == 1) {
                         redirect('admin');
-                    }else{
+                    } else {
                         redirect('user');
                     }
                 } else {
@@ -157,6 +157,5 @@ class Auth extends CI_Controller
         );
 
         redirect('auth');
-
     }
 }
