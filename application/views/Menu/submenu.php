@@ -44,9 +44,7 @@
         </table>
     </div>
 </div>
-</div>
 <!-- /.container-fluid-->
-</div>
 <!-- End of Main Content -->
 
 <!-- Modal -->
@@ -80,6 +78,7 @@
                     </div>
                     <div class="form-group">
                         <div class="form-check">
+                        <input type="hidden" name="is_active" value="0">
                             <input type="checkbox" class="form-check-input" value="1" name="is_active" id="is_active" checked>
                             <label class="form-check-label" for="is_active">
                                 Active?

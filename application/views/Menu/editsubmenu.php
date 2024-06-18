@@ -1,8 +1,9 @@
 <!-- Begin Page Content -->
 <div class="container-fluid">
     <h1 class="h3 mb-4 text-gray-800"><?= $title; ?> Edit </h1>
-    <form error('menu', '<div class="alert alert-danger" role="alert">', '</div>'); ?>
+    <?= form_error('menu', '<div class="alert alert-danger" role="alert">', '</div>'); ?>
     <?= $this->session->flashdata('message'); ?>
+    
     <form action="<?= base_url('menu/updateSubMenu/' . $subMenu['id']); ?>" method="post">
         <div class="form-group">
             <h6>Sub Menu ID</h6>

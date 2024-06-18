@@ -6,6 +6,7 @@ class Menu extends CI_Controller
     public function __construct()
     {
         parent::__construct();
+        $this->load->library('form_validation');
         $this->load->model('Menu_model', 'menuModel');
     }
 
@@ -53,7 +54,7 @@ class Menu extends CI_Controller
             $this->load->view('templates/header', $data);
             $this->load->view('templates/sidebar', $data);
             $this->load->view('templates/topbar', $data);
-            $this->load->view('menu/edit', $data);
+            $this->load->view('menu/editmenu', $data);
             $this->load->view('templates/footer');
         } else {
             $dataedited = [
@@ -70,8 +71,8 @@ class Menu extends CI_Controller
         $data['title'] = 'Submenu Management';
         $data['user'] = $this->db->get_where('user', ['email' => $this->session->userdata('email')])->row_array();
 
-        $data['submenu'] = $this->menuModel->getSubMenu();
-        $data['menu'] = $this->db->get('user_menu')->result_array();
+        $data['subMenu'] = $this->menuModel->getSubMenu();
+        $data['menu'] = $this->menuModel->getMenu();
 
         $this->form_validation->set_rules('title', 'Title', 'required');
         $this->form_validation->set_rules('menu_id', 'Menu', 'required');
@@ -100,7 +101,11 @@ class Menu extends CI_Controller
 
     public function deleteSubMenu($id)
     {
-        $this->menuModel->deleteSubMenu($id);
+        $data = [
+            'is_active' => '0'
+        ];
+
+        $this->menuModel->deleteSubMenu($data,$id);
         $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Sub menu was deleted!</div>');
         redirect('menu/submenu');
     }
@@ -109,8 +114,8 @@ class Menu extends CI_Controller
     {
         $data['title'] = 'Submenu Management';
         $data['user'] = $this->db->get_where('user', ['email' => $this->session->userdata('email')])->row_array();
-        $data['submenu'] = $this->menuModel->getSubMenuByID($id);
-        $data['menu'] = $this->db->get('user_menu')->result_array();
+        $data['subMenu'] = $this->menuModel->getSubMenuByID($id);
+        $data['menu'] = $this->menuModel->getMenu();
 
         $this->form_validation->set_rules('title', 'Title', 'required');
         $this->form_validation->set_rules('menu_id', 'Menu', 'required');
@@ -131,7 +136,7 @@ class Menu extends CI_Controller
                 'icon' => $this->input->post('icon'),
                 'is_active' => $this->input->post('is_active')
             ];
-            $this->menuModel->updateSubMenu($id, $dataedited);
+            $this->menuModel->updateSubMenu($dataedited,$id);
             $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Sub menu was updated!</div>');
             redirect('menu/submenu');
         }
